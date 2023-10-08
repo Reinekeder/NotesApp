@@ -76,6 +76,7 @@ namespace NoteApp
                     WriteNote();
                 }
             }
+
             else
             {
                 using StreamWriter writer = File.CreateText(NoteDirectory + filename);
@@ -130,11 +131,30 @@ namespace NoteApp
             if (File.Exists(notePath))
             {
                 var lines = ShowNoteContent(notePath);
-                ////Добавить варианты Добавления, Изменения определенной строки
-                Console.WriteLine("Input more text: ");
-                string input = Console.ReadLine();
-                lines.Add(input);
-                File.WriteAllLines(notePath, lines);
+                Console.WriteLine("Press a to add lines, r to rewrite chosen line.");
+                string confirmation = Console.ReadLine().ToLower();
+
+                if (confirmation == "a")
+                {
+                    Console.WriteLine("Input more text: ");
+                    string input = Console.ReadLine();
+                    lines.Add(input);
+                    File.WriteAllLines(notePath, lines);
+                }
+                else if (confirmation == "r")
+                {
+                    Console.WriteLine("Enter number of line you want to change: ");
+                    bool isInt = int.TryParse(Console.ReadLine(), out int chosenLine);
+                    Console.WriteLine("Input more text: ");
+                    string input = Console.ReadLine();
+                    lines[chosenLine - 1] = input;
+                    File.WriteAllLines(notePath, lines);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid command, please re-enter!");
+                    DeleteNote();
+                }
             }
             else
             {
