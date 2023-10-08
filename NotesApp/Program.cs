@@ -8,13 +8,13 @@ namespace NoteApp
 {
     class Program
     {
-        static readonly string NoteDirectory = 
+        static readonly string NoteDirectory =
             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Notes\";
 
         static void Main(string[] args)
         {
             Directory.CreateDirectory(NoteDirectory);
-            CheckNotes();
+            CheckNotesOnLaunch();
             HandleUserCommand();
         }
 
@@ -35,28 +35,13 @@ namespace NoteApp
             return fileInfo.Length != 0;
         }
 
-        private static void CheckNotes()
+        private static void CheckNotesOnLaunch()
         {
             var checkFiles = TryGetFileInfo(out _);
             if (!checkFiles)
             {
                 WriteNote();
             }
-        }
-
-        private static void ReadCommand()
-        {
-            string commandInput = Console.ReadLine();
-
-            if (TryGetNoteCommand(commandInput, out Action command))
-            {
-                command();
-            }
-        }
-
-        private static bool TryGetNoteCommand(string commandInput, out Action command)
-        {
-            return Commands.TryGetValue(commandInput.ToLower(), out command);
         }
 
         private static void WriteNote()
@@ -67,10 +52,37 @@ namespace NoteApp
             Console.WriteLine("Enter file name: ");
             string filename = Console.ReadLine() + ".txt";
 
-            using StreamWriter writer = File.CreateText(NoteDirectory + filename);
-            writer.WriteLine(input);
-            writer.Flush();
-            writer.Close();
+            if (File.Exists(NoteDirectory + filename))
+            {
+                Console.WriteLine("Are you sure you want to rewrite this file?? Press Y/N: ");
+                string confirmation = Console.ReadLine().ToLower();
+
+                if (confirmation == "y")
+                {
+                    using StreamWriter writer = File.CreateText(NoteDirectory + filename);
+                    writer.WriteLine(input);
+                    writer.Flush();
+                    writer.Close();
+                }
+
+                else if (confirmation == "n")
+                {
+                    return;
+                }
+
+                else
+                {
+                    Console.WriteLine("Invalid command, please re-enter!");
+                    WriteNote();
+                }
+            }
+            else
+            {
+                using StreamWriter writer = File.CreateText(NoteDirectory + filename);
+                writer.WriteLine(input);
+                writer.Flush();
+                writer.Close();
+            }
         }
         private static List<string> ShowNoteContent(string notePath)
         {
@@ -118,6 +130,7 @@ namespace NoteApp
             if (File.Exists(notePath))
             {
                 var lines = ShowNoteContent(notePath);
+                ////Добавить варианты Добавления, Изменения определенной строки
                 Console.WriteLine("Input more text: ");
                 string input = Console.ReadLine();
                 lines.Add(input);
@@ -193,6 +206,21 @@ namespace NoteApp
         private static void ShowNoteDirectory()
         {
             Process.Start("explorer.exe", NoteDirectory);
+        }
+
+        private static void ReadCommand()
+        {
+            string commandInput = Console.ReadLine();
+
+            if (TryGetNoteCommand(commandInput, out Action command))
+            {
+                command();
+            }
+        }
+
+        private static bool TryGetNoteCommand(string commandInput, out Action command)
+        {
+            return Commands.TryGetValue(commandInput.ToLower(), out command);
         }
 
         private static readonly Dictionary<string, Action> Commands = new()
