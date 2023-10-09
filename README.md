@@ -1,7 +1,14 @@
 # Консольное приложение для заметок
 ____
 ## Доступные команды
-![image](https://github.com/Reinekeder/NotesApp/assets/78594772/b07c519e-ae66-4857-84a4-c4ecc3535f9d)
++ end - Close the application
++ new - Write a new note
++ read - Read a note
++ edit - Edit note
++ delete - Delete a note
++ show - Show all notes
++ dir - Open note directory
++ cls - Clear screen
 
 ## Требования к приложению
 ### Обязательно: 
